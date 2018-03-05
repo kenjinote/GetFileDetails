@@ -32,8 +32,6 @@ VOID GetFileDetails(LPCTSTR lpszFilePath, HWND hEdit)
 		}
 		VARIANT vNull = { 0 };
 		VariantInit(&vNull);
-		TCHAR szText[1024];
-		szText[0] = 0;
 		for (int i = 0; i < 1000; ++i)
 		{
 			BSTR bstrColumn = 0;
@@ -47,10 +45,10 @@ VOID GetFileDetails(LPCTSTR lpszFilePath, HWND hEdit)
 				folder->GetDetailsOf((VARIANT)vItem, i, &bstrValue);
 				if (lstrlen(bstrValue) > 0)
 				{
-					lstrcat(szText, bstrColumn);
-					lstrcat(szText, TEXT(":"));
-					lstrcat(szText, bstrValue);
-					lstrcat(szText, TEXT("\r\n"));
+					SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)bstrColumn);
+					SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)TEXT(":"));
+					SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)bstrValue);
+					SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)TEXT("\r\n"));
 				}
 				SysFreeString(bstrValue);
 				item->Release();
@@ -60,7 +58,6 @@ VOID GetFileDetails(LPCTSTR lpszFilePath, HWND hEdit)
 		folder->Release();
 		pUnknown->Release();
 		VariantClear(&vNull);
-		SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)szText);
 	}
 	CoUninitialize();
 }
