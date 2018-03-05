@@ -16,7 +16,6 @@ VOID GetFileDetails(LPCTSTR lpszFilePath, HWND hEdit)
 	lstrcpy(szFolderPath, lpszFilePath);
 	PathRemoveFileSpec(szFolderPath);
 	lstrcpy(szFileName, PathFindFileName(lpszFilePath));
-	SetWindowText(hEdit, 0);
 	CoInitialize(0);
 	IShellDispatch* pUnknown = NULL;
 	struct __declspec(uuid("13709620-C279-11CE-A49E-444553540000")) Cls;
@@ -75,18 +74,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		MoveWindow(hEdit, 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);
 		break;
 	case WM_DROPFILES:
-	{
-		SetWindowText(hEdit, 0);
-		const int nFileCount = DragQueryFile((HDROP)wParam, -1, NULL, 0);
-		for (int i = 0; i<nFileCount; i++)
 		{
-			TCHAR szFilePath[MAX_PATH];
-			DragQueryFile((HDROP)wParam, i, szFilePath, _countof(szFilePath));
-			GetFileDetails(szFilePath, hEdit);
+			SetWindowText(hEdit, 0);
+			const int nFileCount = DragQueryFile((HDROP)wParam, -1, NULL, 0);
+			for (int i = 0; i < nFileCount; ++i)
+			{
+				TCHAR szFilePath[MAX_PATH];
+				DragQueryFile((HDROP)wParam, i, szFilePath, _countof(szFilePath));
+				GetFileDetails(szFilePath, hEdit);
+				SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)TEXT("----------------------------------------------------------------\r\n"));
+			}
+			DragFinish((HDROP)wParam);
 		}
-		DragFinish((HDROP)wParam);
-	}
-	break;
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
